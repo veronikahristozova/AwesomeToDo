@@ -10,29 +10,40 @@ import UIKit
 
 class TaskViewController: UIViewController {
     
-    // MARK: - Variables
-    lazy var previewActions: [UIPreviewActionItem] = {
-        
+    @IBOutlet weak var label: UILabel!
+    
+    var position: Int?
+    
+    // MARK: - Methods
+    func previewActions() -> [UIPreviewActionItem]{
         let deleteAction = UIPreviewAction(title: "Delete", style: .destructive) { action, viewController in
-            //Todo: delete from core data
+            if let position = self.position, let title = CoreDataTask.loadTask(position: position).title {
+                CoreDataTask.deleteTask(title: title)
+            }
         }
         
         let completeAction = UIPreviewAction(title: "Complete", style: .default) { (action, viewController) in
-            // mark as completed
+            if let position = self.position, let title = CoreDataTask.loadTask(position: position).title {
+                CoreDataTask.markAsCompleted(title: title)
+            }
         }
-        
-        return [completeAction, deleteAction]
-    }()
+         return [completeAction, deleteAction]
+    }
+    
+    func setupUI() {
+        if let position = position {
+            label.text = CoreDataTask.loadTask(position: position).title
+        }
+    }
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
+        setupUI()
     }
     
     // MARK: - Peek and Pop preview actions
     override var previewActionItems: [UIPreviewActionItem] {
-        return previewActions
+        return previewActions()
     }
 }

@@ -13,7 +13,6 @@
 		9629448A1F2AFD2F00189743 /* AwesomeToDo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 962944881F2AFD2F00189743 /* AwesomeToDo.xcdatamodeld */; };
 		9629448C1F2AFD2F00189743 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9629448B1F2AFD2F00189743 /* Assets.xcassets */; };
 		9629448F1F2AFD2F00189743 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9629448D1F2AFD2F00189743 /* LaunchScreen.storyboard */; };
-		962944991F2B05BE00189743 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962944981F2B05BE00189743 /* Task.swift */; };
 		9629449B1F2B065C00189743 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9629449A1F2B065C00189743 /* Extensions.swift */; };
 		9629449F1F2B06FF00189743 /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9629449E1F2B06FF00189743 /* ColorPalette.swift */; };
 		962944A11F2B0A0A00189743 /* TaskCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962944A01F2B0A0A00189743 /* TaskCollectionViewCell.swift */; };
@@ -31,7 +30,6 @@
 		9629448B1F2AFD2F00189743 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9629448E1F2AFD2F00189743 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		962944901F2AFD2F00189743 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		962944981F2B05BE00189743 /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		9629449A1F2B065C00189743 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		9629449E1F2B06FF00189743 /* ColorPalette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
 		962944A01F2B0A0A00189743 /* TaskCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -74,7 +72,7 @@
 				962944831F2AFD2F00189743 /* MainViewController.swift */,
 				962944A21F2B100700189743 /* TaskViewController.swift */,
 				962944AE1F2B354300189743 /* AddNewTaskViewController.swift */,
-				9629449C1F2B066300189743 /* Models */,
+				9629449C1F2B066300189743 /* UI */,
 				9629449D1F2B066A00189743 /* Utilities */,
 				962944961F2AFD4300189743 /* Supporting Files */,
 				962944971F2AFD5500189743 /* Core Data */,
@@ -102,13 +100,12 @@
 			name = "Core Data";
 			sourceTree = "<group>";
 		};
-		9629449C1F2B066300189743 /* Models */ = {
+		9629449C1F2B066300189743 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				962944981F2B05BE00189743 /* Task.swift */,
 				962944A01F2B0A0A00189743 /* TaskCollectionViewCell.swift */,
 			);
-			name = Models;
+			name = UI;
 			sourceTree = "<group>";
 		};
 		9629449D1F2B066A00189743 /* Utilities */ = {
@@ -194,7 +191,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9629449B1F2B065C00189743 /* Extensions.swift in Sources */,
-				962944991F2B05BE00189743 /* Task.swift in Sources */,
 				962944AA1F2B2BF100189743 /* CoreDataTask+CoreDataClass.swift in Sources */,
 				962944841F2AFD2F00189743 /* MainViewController.swift in Sources */,
 				962944821F2AFD2F00189743 /* AppDelegate.swift in Sources */,

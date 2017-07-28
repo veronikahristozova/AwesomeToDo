@@ -42,13 +42,18 @@ public class CoreDataTask: NSManagedObject {
         return []
     }
     
+    static func loadTask(position: Int) -> CoreDataTask {
+        return loadTasks()[position]
+    }
+    
     
     // MARK: - Save Task
     static func saveTask(title: String, categoryName: String, categoryColor: Int64, date: String, isCompleted: Bool) {
         let tasks = loadTasks()
+        let managedContext = getContext()
         
-        if let entity = NSEntityDescription.entity(forEntityName: "CoreDataTask", in: getContext()) {
-            let task = NSManagedObject(entity: entity, insertInto: getContext())
+        if let entity = NSEntityDescription.entity(forEntityName: "CoreDataTask", in: managedContext) {
+            let task = NSManagedObject(entity: entity, insertInto: managedContext)
             
             task.setValue(title, forKey: "title")
             task.setValue(categoryName, forKey: "categoryName")
@@ -57,7 +62,7 @@ public class CoreDataTask: NSManagedObject {
             task.setValue(isCompleted, forKey: "isCompleted")
             
             do {
-                try getContext().save()
+                try managedContext.save()
             } catch let error {
                 print("Could not save \(error)")
             }
@@ -65,10 +70,10 @@ public class CoreDataTask: NSManagedObject {
             
             if tasks.count >= maxTasksCount {
                 do {
-                    let results = try getContext().fetch(request)
-                    getContext().delete(results.first as! NSManagedObject)
+                    let results = try managedContext.fetch(request)
+                    managedContext.delete(results.first as! NSManagedObject)
                     do {
-                        try getContext().save()
+                        try managedContext.save()
                     } catch let error {
                         print("Could not save \(error)")
                     }
@@ -82,26 +87,37 @@ public class CoreDataTask: NSManagedObject {
     // MARK: - Delete Task
     static func deleteTask(title: String) {
         let managedContext = getContext()
+        
         do {
             let results = try managedContext.fetch(request)
-            for managedObject in results
-            {
-                if (managedObject as AnyObject).title == title {
-                    let managedObjectData = managedObject as! NSManagedObject
-                    managedContext.delete(managedObjectData)
-                    do {
-                        try managedContext.save()
-                    } catch let error as NSError  {
-                        print("Could not save \(error), \(error.userInfo)")
-                    }
-                }
+            let managedObjectData = results.filter({ ($0 as AnyObject).title == title }).first as! NSManagedObject
+            managedContext.delete(managedObjectData)
+            do {
+                try managedContext.save()
+            } catch let error as NSError  {
+                print("Could not save \(error), \(error.userInfo)")
             }
         } catch let error as NSError {
-            print("Delete data in CartItems error : \(error) \(error.userInfo)")
+            print("Delete data in CoreDataTask error : \(error) \(error.userInfo)")
         }
-        
     }
     
-    
+    //MARK - Mark as completed method
+    static func markAsCompleted(title: String) {
+        let managedContext = getContext()
+        
+        do {
+            let results = try managedContext.fetch(request)
+            let object = results.filter({ ($0 as AnyObject).title == title }).first as! CoreDataTask
+            object.setValue(true, forKey: "isCompleted")
+            do {
+                try managedContext.save()
+            } catch let error as NSError  {
+                print("Could not save \(error), \(error.userInfo)")
+            }
+        } catch let error as NSError {
+            print("Update data in CoreDataTask error : \(error) \(error.userInfo)")
+        }
+    }
     
 }

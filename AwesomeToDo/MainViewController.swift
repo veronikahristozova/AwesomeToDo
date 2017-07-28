@@ -10,12 +10,12 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    // MARK: - IBOutlets
+    @IBOutlet weak var tasksCollectionView: UICollectionView!
+    
     // MARK: - Variables
     fileprivate let itemsPerRow: CGFloat = 2
     fileprivate let sectionInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10.0)
-
-    var tasks = [Task]()
-    
     
     ///Support for devices with no force touch
     lazy var longPress: UILongPressGestureRecognizer = {
@@ -23,7 +23,7 @@ class MainViewController: UIViewController {
         return longPressGesture
     }()
     
-    func check3DTouchEnabledFlag() {
+    func forceTouchAvailability() {
         if self.traitCollection.forceTouchCapability == .available {
             self.longPress.isEnabled = false
             //Force touch exists
@@ -38,46 +38,50 @@ class MainViewController: UIViewController {
         //TODO:
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showSingleTask" {
+            let singleTaskViewController = segue.destination as! TaskViewController
+            if let cell = sender as? TaskCollectionViewCell {
+                if let position = tasksCollectionView.indexPath(for: cell)?.row {
+                    singleTaskViewController.position = position
+                }
+            }
+        }
+    }
+    
     // MARK: - Lifecycle Control
     override func viewDidLoad() {
         super.viewDidLoad()
-        let task1 = Task(title: "Walk the dog", categoryName: "Work", categoryColor: ColorPalette.Pink, date: nil)
-        let task2 = Task(title: "Buy flowers", categoryName: "Home", categoryColor: ColorPalette.LightGreen, date: nil)
-        
-        let task3 = Task(title: "idk i'm tired lets try something", categoryName: "Chritmas", categoryColor: ColorPalette.DarkGreen, date: nil)
-        let task4 = Task(title: "idk i'm tired lets try something", categoryName: "Chritmas", categoryColor: ColorPalette.Orange, date: nil)
-        let task5 = Task(title: "idk i'm tired lets try something", categoryName: "Chritmas", categoryColor: ColorPalette.Yellow, date: nil)
-        let task6 = Task(title: "idk i'm tired lets try something isd kjh jh jkh kh h h ", categoryName: "Chritmas", categoryColor: ColorPalette.Red, date: nil)
-        tasks.append(task1)
-        tasks.append(task2)
-        tasks.append(task3)
-        tasks.append(task4)
-        tasks.append(task5)
-        tasks.append(task6)
-        
         self.view.addGestureRecognizer(longPress)
-        
+        registerForPreviewing(with: self, sourceView: tasksCollectionView)
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        check3DTouchEnabledFlag()
+        forceTouchAvailability()
+        tasksCollectionView.reloadData()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        check3DTouchEnabledFlag()
+        forceTouchAvailability()
+    }
+    
+    func createDetailViewControllerIndexPath(indexPath: IndexPath) -> TaskViewController {
+        let taskViewController = storyboard?.instantiateViewController(withIdentifier: "TaskViewController") as! TaskViewController
+        taskViewController.position = indexPath.row        
+        return taskViewController
     }
 }
 
 // MARK: - UICollection View DataSourceDelegate
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return tasks.count
+        return CoreDataTask.loadTasks().count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "todocell", for: indexPath) as! TaskCollectionViewCell
-        cell.task = tasks[indexPath.row]
-        // Configure the cell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! TaskCollectionViewCell
+        cell.task = CoreDataTask.loadTasks()[indexPath.row]
         return cell
     }
 }
@@ -98,5 +102,23 @@ extension MainViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return sectionInsets.left
+    }
+}
+
+// MARK: - UIViewControllerPreviewingDelegate methods
+extension MainViewController: UIViewControllerPreviewingDelegate {
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+        
+        guard let indexPath = tasksCollectionView.indexPathForItem(at: location) else {
+            return nil
+        }
+        
+        let detailViewController = createDetailViewControllerIndexPath(indexPath: indexPath)
+        
+        return detailViewController
+    }
+    
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+        navigationController?.pushViewController(viewControllerToCommit, animated: true)
     }
 }

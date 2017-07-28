@@ -14,18 +14,19 @@ class TaskCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var categoryColorView: UIView!
     @IBOutlet weak var pinImageView: UIImageView!
     
-    var task: Task? { didSet { updateUI() } }
+    var task: CoreDataTask? { didSet { updateUI() } }
 
     func updateUI() {
         if let task = task {
             taskTitleLabel.text = task.title
-            categoryColorView.backgroundColor = task.categoryColor
+            categoryColorView.backgroundColor = UIColor(netHex: Int(task.categoryColor))
             pinImageView.tintColor = task.isCompleted ? .green : .red
+            self.backgroundColor = UIColor(netHex: Int(task.categoryColor))
+            pinImageView.image = task.isCompleted ? #imageLiteral(resourceName: "greenPin") : #imageLiteral(resourceName: "redPin")
         }
         
         self.layer.cornerRadius = 4
         self.layer.borderWidth  = 1
         self.layer.borderColor  = UIColor.lightGray.cgColor
-        self.backgroundColor    = task?.categoryColor
     }
 }
