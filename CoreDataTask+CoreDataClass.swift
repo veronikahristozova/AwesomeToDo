@@ -12,10 +12,10 @@ import UIKit
 @objc(CoreDataTask)
 public class CoreDataTask: NSManagedObject {
 
+    // MARK: - Properties
     @NSManaged public var title: String?
     @NSManaged public var categoryName: String?
     @NSManaged public var categoryColor: Int64
-    @NSManaged public var date: String?
     @NSManaged public var isCompleted: Bool
     
     static let request = NSFetchRequest<NSFetchRequestResult>(entityName: "CoreDataTask")
@@ -30,25 +30,39 @@ public class CoreDataTask: NSManagedObject {
         return managedObjectContext
     }
     
-    // MARK: - Load Tasks
+    /// Retrieving all tasks saved in Core Data
+    ///
+    /// - Returns: the array of tasks
     static func loadTasks() -> [CoreDataTask] {
         let managedContext = getContext()
         
         do {
             return try managedContext.fetch(request) as? [CoreDataTask] ?? [CoreDataTask]()
         } catch let error as NSError {
-            print("Could not fetch \(error), \(error.userInfo)")
+            print("Core Data: Could not fetch context \(error), \(error.userInfo)")
         }
         return []
     }
     
+    
+    /// Retrieving Single Task from Core Data
+    ///
+    /// - Parameter position: position in the array on tasks
+    /// - Returns: the value at this position
     static func loadTask(position: Int) -> CoreDataTask {
         return loadTasks()[position]
     }
     
     
-    // MARK: - Save Task
-    static func saveTask(title: String, categoryName: String, categoryColor: Int64, date: String, isCompleted: Bool) {
+    
+    /// Saving Single Task in Core Data
+    ///
+    /// - Parameters:
+    ///   - title: the title of the task
+    ///   - categoryName: the task's category name
+    ///   - categoryColor: the task's category color
+    ///   - isCompleted: the task's state
+    static func saveTask(title: String, categoryName: String, categoryColor: Int64, isCompleted: Bool) {
         let tasks = loadTasks()
         let managedContext = getContext()
         
@@ -58,13 +72,12 @@ public class CoreDataTask: NSManagedObject {
             task.setValue(title, forKey: "title")
             task.setValue(categoryName, forKey: "categoryName")
             task.setValue(categoryColor, forKey: "categoryColor")
-            task.setValue(date, forKey: "date")
             task.setValue(isCompleted, forKey: "isCompleted")
             
             do {
                 try managedContext.save()
             } catch let error {
-                print("Could not save \(error)")
+                print("Could not save with \(error)")
             }
             
             
@@ -75,17 +88,22 @@ public class CoreDataTask: NSManagedObject {
                     do {
                         try managedContext.save()
                     } catch let error {
-                        print("Could not save \(error)")
+                        print("Could not save context \(error)")
                     }
                 } catch let error {
-                    print("Delete single data in CoreDataTask error: \(error)")
+                    print("Save task in CoreDataTask error: \(error)")
                 }
             }
         }
     }
     
-    // MARK: - Delete Task
-    static func deleteTask(title: String) {
+    
+    /// Deletes a single task
+    ///
+    /// - Parameters:
+    ///   - title: the title of the task to delete
+    ///   - completion: completion block
+    static func deleteTask(title: String, completion: @escaping ()->()) {
         let managedContext = getContext()
         
         do {
@@ -94,16 +112,22 @@ public class CoreDataTask: NSManagedObject {
             managedContext.delete(managedObjectData)
             do {
                 try managedContext.save()
+                completion()
             } catch let error as NSError  {
-                print("Could not save \(error), \(error.userInfo)")
+                print("Could not save context \(error), \(error.userInfo)")
             }
         } catch let error as NSError {
-            print("Delete data in CoreDataTask error : \(error) \(error.userInfo)")
+            print("Delete task in CoreDataTask error : \(error) \(error.userInfo)")
         }
     }
     
-    //MARK - Mark as completed method
-    static func markAsCompleted(title: String) {
+    
+    /// Updating single task
+    ///
+    /// - Parameters:
+    ///   - title: the title of the task
+    ///   - completion: completion block
+    static func markAsCompleted(title: String, completion: @escaping ()->()) {
         let managedContext = getContext()
         
         do {
@@ -112,12 +136,12 @@ public class CoreDataTask: NSManagedObject {
             object.setValue(true, forKey: "isCompleted")
             do {
                 try managedContext.save()
+                completion()
             } catch let error as NSError  {
-                print("Could not save \(error), \(error.userInfo)")
+                print("Could not save context \(error), \(error.userInfo)")
             }
         } catch let error as NSError {
-            print("Update data in CoreDataTask error : \(error) \(error.userInfo)")
+            print("Could not fetch data in CoreDataTask error : \(error) \(error.userInfo)")
         }
     }
-    
 }

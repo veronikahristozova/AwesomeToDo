@@ -20,24 +20,51 @@ class MainViewController: UIViewController {
     ///Support for devices with no force touch
     lazy var longPress: UILongPressGestureRecognizer = {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        longPressGesture.minimumPressDuration = 0.5
         return longPressGesture
     }()
     
     func forceTouchAvailability() {
         if self.traitCollection.forceTouchCapability == .available {
-            self.longPress.isEnabled = false
             //Force touch exists
+            self.longPress.isEnabled = false
         } else {
-            self.longPress.isEnabled = true
             //Force touch does not exist on this device
+            self.longPress.isEnabled = true
         }
     }
     
     func handleLongPress() {
-        print("Long press button clicked")
-        //TODO:
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let point = longPress.location(in: tasksCollectionView)
+        if let position = tasksCollectionView.indexPathForItem(at: point)?.row,
+           let title = CoreDataTask.loadTask(position: position).title {
+            
+            let completeAction = UIAlertAction(title: "Mark as complete", style: .default) { _ in
+                CoreDataTask.markAsCompleted(title: title, completion: {
+                    DispatchQueue.main.async {
+                        self.tasksCollectionView.reloadData()
+                    }
+                })
+            }
+            let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { _ in
+                CoreDataTask.deleteTask(title: title, completion: {
+                    DispatchQueue.main.async {
+                        self.tasksCollectionView.reloadData()
+                    }
+                })
+            }
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            
+            alertController.addAction(completeAction)
+            alertController.addAction(deleteAction)
+            alertController.addAction(cancelAction)
+            present(alertController, animated: true, completion: nil)
+        }
     }
     
+    // MARK: - Prepare For Segues
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showSingleTask" {
             let singleTaskViewController = segue.destination as! TaskViewController
@@ -52,13 +79,17 @@ class MainViewController: UIViewController {
     // MARK: - Lifecycle Control
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //Long Press Gesture recognizer if Peek and Pop not available
         self.view.addGestureRecognizer(longPress)
+        //Peek and Pop Previewing
         registerForPreviewing(with: self, sourceView: tasksCollectionView)
+        
+        forceTouchAvailability()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        forceTouchAvailability()
         tasksCollectionView.reloadData()
     }
     
@@ -66,9 +97,11 @@ class MainViewController: UIViewController {
         forceTouchAvailability()
     }
     
+    // MARK: - Helper func
     func createDetailViewControllerIndexPath(indexPath: IndexPath) -> TaskViewController {
         let taskViewController = storyboard?.instantiateViewController(withIdentifier: "TaskViewController") as! TaskViewController
-        taskViewController.position = indexPath.row        
+        taskViewController.position = indexPath.row
+        taskViewController.delegate = self
         return taskViewController
     }
 }
@@ -120,5 +153,14 @@ extension MainViewController: UIViewControllerPreviewingDelegate {
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
         navigationController?.pushViewController(viewControllerToCommit, animated: true)
+    }
+}
+
+// MARK: - SingleTask Delegate
+extension MainViewController: SingleTaskDelegate {
+    func didUpdateTask() {
+        DispatchQueue.main.async {
+            self.tasksCollectionView.reloadData()
+        }
     }
 }

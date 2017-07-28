@@ -10,10 +10,12 @@ import UIKit
 
 class TaskCollectionViewCell: UICollectionViewCell {
     
+    //MARK: - IBOutlets
     @IBOutlet weak var taskTitleLabel: UILabel!
     @IBOutlet weak var categoryColorView: UIView!
     @IBOutlet weak var pinImageView: UIImageView!
     
+    //MARK: - Variables
     var task: CoreDataTask? { didSet { updateUI() } }
 
     func updateUI() {
