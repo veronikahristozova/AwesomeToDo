@@ -1,5 +1,5 @@
 # AwesomeToDo iOS app
-by Veronika Hristozova 
+by Veronika Hristozova - 
 veronikahristozova@gmail.com
 
 
@@ -28,4 +28,3 @@ Edit a task
 Please let me know if the app should explicitly have “swipe to delete” option, local notifications, task date and I will make the changes.
 
 Total time spent: approx 7h
-
