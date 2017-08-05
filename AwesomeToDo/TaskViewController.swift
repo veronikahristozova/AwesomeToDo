@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol SingleTaskDelegate {
+protocol SingleTaskDelegate: class {
     func didUpdateTask()
 }
 
@@ -21,7 +21,7 @@ class TaskViewController: UIViewController {
     
     // MARK: - Variables
     var position: Int?
-    var delegate: SingleTaskDelegate?
+    weak var delegate: SingleTaskDelegate?
     
     // MARK: - Methods
     func previewActions() -> [UIPreviewActionItem]{
